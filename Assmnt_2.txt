@@ -1,0 +1,83 @@
+--Create Tables :
+
+CREATE TABLE Users (
+    userId INTEGER PRIMARY KEY AUTOINCREMENT,
+    userName VARCHAR NOT NULL,
+    email VARCHAR NOT NULL UNIQUE,
+    phoneNumber VARCHAR NOT NULL UNIQUE
+);
+
+CREATE TABLE Tweets (
+    tweetId INTEGER PRIMARY KEY AUTOINCREMENT,
+    userId INTEGER NOT NULL,
+    CommentParentId INTEGER DEFAULT NULL,
+    content TEXT NOT NULL,
+    createTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (userId) REFERENCES Users(userId),
+    FOREIGN KEY (CommentParentId) REFERENCES Tweets(tweetId)
+);
+
+CREATE TABLE Likes (
+    likeId INTEGER PRIMARY KEY AUTOINCREMENT,
+    userId INTEGER NOT NULL,
+    tweetId INTEGER NOT NULL,
+    createTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (userId) REFERENCES Users(userId),
+    FOREIGN KEY (tweetId) REFERENCES Tweets(tweetId)
+);
+
+CREATE TABLE Retweets (
+    retweetId INTEGER PRIMARY KEY AUTOINCREMENT,
+    userId INTEGER NOT NULL,
+    originalTweetId INTEGER NOT NULL,
+    createTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (userId) REFERENCES Users(userId),
+    FOREIGN KEY (originalTweetId) REFERENCES Tweets(tweetId)
+);
+
+CREATE TABLE Followers (
+    FollowId INTEGER PRIMARY KEY AUTOINCREMENT,
+    FollowerUserId INTEGER NOT NULL,
+    FollowedUserId INTEGER NOT NULL,
+    createTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (FollowerUserId) REFERENCES Users(userId),
+    FOREIGN KEY (FollowedUserId) REFERENCES Users(userId)
+);
+
+
+--Insert quries:
+
+
+-- Inserting users
+INSERT INTO Users (userName, email, phoneNumber) VALUES
+    ('Vader', 'vader@example.com', '123456789'),
+    ('Leia', 'leia@example.com', '987654321'),
+    ('Obi-Wan', 'obiwan@example.com', '555555555');
+
+-- Vader posts a tweet
+INSERT INTO Tweets (userId, content) VALUES
+    (1, 'I find your lack of faith disturbing.');
+
+-- Leia likes Vader's tweet
+INSERT INTO Likes (userId, tweetId) VALUES
+    (2, 1);
+
+-- Obi-Wan retweets Vader's tweet
+INSERT INTO Retweets (userId, originalTweetId) VALUES
+    (3, 1);
+
+-- Leia follows Vader
+INSERT INTO Followers (followerUserId, followedUserId) VALUES
+    (2, 1);
+
+-- Vader follows Obi-Wan
+INSERT INTO Followers (followerUserId, followedUserId) VALUES
+    (1, 3);
+
+-- Obi-Wan tweets
+INSERT INTO Tweets (userId, content) VALUES
+    (3, 'The Force will be with you. Always.');
+
+-- Leia comments on Obi-Wan's tweet
+INSERT INTO Tweets (userId, CommentParentId, content) VALUES
+    (2, 2, 'Help me, Obi-Wan Kenobi. You’re my only hope.');

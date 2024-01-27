@@ -1,0 +1,44 @@
+Fetch all users name from database.
+
+> SELECT USERNAME FROM USERS;
+
+
+Fetch all tweets of user by user id most recent tweets first.
+
+> SELECT USERID,CONTENT,CREATETIME FROM TWEETS WHERE COMMENTPARENTID IS NULL ORDER BY CREATETIME DESC;
+
+
+Fetch like count of particular tweet by tweet id.
+
+> SELECT TWEETS.TWEETID, COUNT(LIKES.TWEETID) AS LIKES FROM TWEETS LEFT JOIN LIKES ON TWEETS.TWEETID = LIKES.TWEETID GROUP BY TWEETS.TWEETID;
+
+
+Fetch retweet count of particular tweet by tweet id.
+
+> SELECT TWEETS.TWEETID, COUNT(RETWEETS.ORIGINALTWEETID) AS RETWEETS FROM TWEETS LEFT JOIN RETWEETS ON TWEETS.TWEETID = RETWEETS.ORIGINALTWEETID GROUP BY TWEETS.TWEETID;
+
+
+Fetch comment count of particular tweet by tweet id.
+
+> SELECT TWEETS.TWEETID,COUNT(COMMENTS.COMMENTPARENTID) AS NO_OF_COMMENTS FROM TWEETS LEFT JOIN TWEETS AS COMMENTS ON TWEETS.TWEETID = COMMENTS.COMMENTPARENTID GROUP BY TWEETS.TWEETID;
+
+
+Fetch all user’s name who have retweeted particular tweet by tweet id.
+
+> SELECT RETWEETS.ORIGINALTWEETID AS ORIGINAL_TWEETID,USERS.USERNAME AS NAME FROM RETWEETS LEFT JOIN USERS ON RETWEETS.USERID=USERS.USERID;
+
+
+Fetch all commented tweet’s content for particular tweet by tweet id.
+> SELECT TWEETS.TWEETID,TWEETS.CONTENT AS ORIGINAL_TWEET,COMMENTS.CONTENT AS COMMENT FROM TWEETS INNER JOIN TWEETS AS COMMENTS ON TWEETS.TWEETID = COMMENTS.COMMENTPARENTID ORDER BY TWEETS.TWEETID;
+
+
+Fetch user’s timeline (All tweets from users whom I am following with tweet content and user name who has tweeted it)
+> SELECT Users.userName,Tweets.content
+  FROM Tweets
+  JOIN Users ON Tweets.userId = Users.userId
+  WHERE Tweets.userId IN (
+      SELECT FollowedUserID
+      FROM Followers
+      WHERE FollowerUserID = 1
+  )
+  ORDER BY Tweets.createTime DESC;
